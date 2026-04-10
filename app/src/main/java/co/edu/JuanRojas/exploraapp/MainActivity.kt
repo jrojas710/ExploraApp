@@ -25,6 +25,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val myNavController = rememberNavController()
 
+            // Definición de las rutas de navegación de la app
             NavHost(
                 navController = myNavController,
                 startDestination = "login",
@@ -33,7 +34,7 @@ class MainActivity : ComponentActivity() {
                 composable(route = "login") {
                     LoginScreen(onLoginSuccess = {}, onNavigateToRegister = {})
                 }
-                composable(route="register"){
+                composable(route = "register") {
                     RegisterScreen(onRegisterSuccess = {}, onNavigateToLogin = {})
                 }
             }
