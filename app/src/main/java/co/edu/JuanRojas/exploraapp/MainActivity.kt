@@ -25,17 +25,22 @@ class MainActivity : ComponentActivity() {
         setContent {
             val myNavController = rememberNavController()
 
-            // Definición de las rutas de navegación de la app
             NavHost(
                 navController = myNavController,
                 startDestination = "login",
                 modifier = Modifier.fillMaxSize()
             ) {
                 composable(route = "login") {
-                    LoginScreen(onLoginSuccess = {}, onNavigateToRegister = {})
+                    LoginScreen(onLoginSuccess = {}, onNavigateToRegister = {
+                        myNavController.navigate("register")
+                    })
                 }
                 composable(route = "register") {
-                    RegisterScreen(onRegisterSuccess = {}, onNavigateToLogin = {})
+                    RegisterScreen(
+                        onRegisterSuccess = {},
+                        onNavigateToLogin = { myNavController.popBackStack() },
+                        onBackClick = { myNavController.popBackStack() }
+                    )
                 }
             }
         }
