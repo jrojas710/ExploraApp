@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "403830429586",
+    "project_id": "explora-app-eb265",
+    "storage_bucket": "explora-app-eb265.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:403830429586:android:911a8d3c83e3d019cdd34b",
+        "android_client_info": {
+          "package_name": "co.edu.JuanRojas.exploraapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA_8BSknbz31g8wK8tF3zMjPDSeUsCI3vA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

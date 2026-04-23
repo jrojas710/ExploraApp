@@ -1,5 +1,6 @@
 package co.edu.JuanRojas.exploraapp
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -21,13 +22,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lint.kotlin.metadata.Visibility
 import co.edu.JuanRojas.exploraapp.ui.theme.ExploraAppTheme
+import com.google.firebase.auth.FirebaseAuth
 
 
 @Composable
@@ -38,6 +40,10 @@ fun LoginScreen(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
+
+    val auth = FirebaseAuth.getInstance()
+    val context = LocalContext.current
+    var isLoading by remember { mutableStateOf(false) }
 
     val primaryOrange = Color(0xFFE45D25)
     val lightGrayBg = Color(0xFFF8F9FE)
@@ -54,7 +60,6 @@ fun LoginScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            // Header
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -120,7 +125,6 @@ fun LoginScreen(
                     .padding(horizontal = 32.dp)
             ) {
 
-                // EMAIL
                 Text("CORREO ELECTRÓNICO", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.Gray)
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -140,12 +144,12 @@ fun LoginScreen(
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent
                     ),
-                    singleLine = true
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // PASSWORD
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
@@ -194,30 +198,48 @@ fun LoginScreen(
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                // LOGIN BUTTON
                 Button(
-                    onClick = { onLoginSuccess() },
+                    onClick = {
+                        if (email.isNotBlank() && password.isNotBlank()) {
+                            isLoading = true
+                            auth.signInWithEmailAndPassword(email.trim(), password.trim())
+                                .addOnCompleteListener { task ->
+                                    isLoading = false
+                                    if (task.isSuccessful) {
+                                        onLoginSuccess()
+                                    } else {
+                                        Toast.makeText(context, task.exception?.message ?: "Error al iniciar sesión", Toast.LENGTH_LONG).show()
+                                    }
+                                }
+                        } else {
+                            Toast.makeText(context, "Por favor llena todos los campos", Toast.LENGTH_SHORT).show()
+                        }
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
                     shape = RoundedCornerShape(28.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                    contentPadding = PaddingValues()
+                    contentPadding = PaddingValues(),
+                    enabled = !isLoading
                 ) {
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
                             .background(
                                 Brush.horizontalGradient(
-                                    listOf(primaryOrange, Color(0xFFFF8A65))
+                                    if (isLoading) listOf(Color.Gray, Color.LightGray)
+                                    else listOf(primaryOrange, Color(0xFFFF8A65))
                                 )
                             ),
                         contentAlignment = Alignment.Center
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text("Iniciar Sesión", fontWeight = FontWeight.Bold)
+                            Text(if (isLoading) "Cargando..." else "Iniciar Sesión", fontWeight = FontWeight.Bold)
                             Spacer(modifier = Modifier.width(8.dp))
-                            Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null)
+                            if (!isLoading) {
+                                Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null)
+                            }
                         }
                     }
                 }
@@ -254,7 +276,7 @@ fun LoginScreen(
 }
 
 @Composable
-fun SocialButton(text: String, modifier: Modifier, icon: androidx.compose.ui.graphics.vector.ImageVector) {
+fun SocialButton(text: String, modifier: Modifier, icon: ImageVector) {
     OutlinedButton(
         onClick = {},
         modifier = modifier.height(50.dp),
